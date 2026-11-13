@@ -1,0 +1,69 @@
+:root {
+  --ink: #1d232a; --quiet: #5b6570; --line: #d9dee3; --bg: #f7f8f9; --card: #ffffff;
+  --accent: #1f6feb; --crit: #c2410c; --warn: #a16207; --info: #475569; --ok: #15803d;
+  --band: rgba(31, 111, 235, 0.08);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink); background: var(--bg); }
+header.top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 8px; padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 700; color: var(--ink); text-decoration: none; }
+nav a { margin-left: 16px; color: var(--quiet); text-decoration: none; }
+nav a:hover { color: var(--accent); }
+main { max-width: 900px; margin: 0 auto; padding: 24px; }
+footer { max-width: 900px; margin: 32px auto; padding: 0 24px 24px; font-size: 13px; color: var(--quiet); }
+h1 { font-size: 28px; margin: 8px 0; }
+h2 { font-size: 20px; margin-top: 32px; }
+.lead { font-size: 18px; color: var(--quiet); }
+.meta, .rule, small { color: var(--quiet); font-size: 13px; }
+small { display: block; margin-top: 4px; }
+a { color: var(--accent); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 24px 16px; }
+.facts { display: flex; gap: 24px; padding: 0; list-style: none; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.button { display: inline-block; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--accent);
+  background: var(--accent); color: #fff; text-decoration: none; font: inherit; cursor: pointer; }
+.button.ghost { background: transparent; color: var(--accent); }
+fieldset { border: 1px solid var(--line); border-radius: 8px; background: var(--card); margin: 0 0 16px; padding: 16px; }
+legend { font-weight: 600; padding: 0 6px; }
+label { display: block; margin-bottom: 12px; font-weight: 500; }
+input, select { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+  width: 100%; max-width: 320px; background: #fff; }
+.grid-input input { max-width: 150px; }
+.grid-input th, .grid-input td { padding: 4px 8px 4px 0; text-align: left; }
+.unit { color: var(--quiet); font-weight: 400; }
+table.data { border-collapse: collapse; width: 100%; background: var(--card); font-size: 14px; }
+table.data th, table.data td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; }
+table.data th { color: var(--quiet); font-weight: 600; }
+.alert { border-radius: 8px; padding: 12px 16px; margin: 16px 0; border: 1px solid var(--line); background: var(--card); }
+.alert.crit { border-color: var(--crit); }
+.alert ul { margin: 6px 0 0; }
+.findings { list-style: none; padding: 0; }
+.finding { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--info);
+  border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+.finding.crit { border-left-color: var(--crit); }
+.finding.warn { border-left-color: var(--warn); }
+.finding p { margin: 6px 0; }
+.finding .sub { font-weight: 600; font-size: 14px; }
+.finding ol { margin: 4px 0; padding-left: 20px; font-size: 14px; }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid currentColor; }
+.badge.crit { color: var(--crit); } .badge.warn { color: var(--warn); }
+.badge.info { color: var(--info); } .badge.ok { color: var(--ok); }
+.ok { color: var(--ok); font-weight: 500; }
+.formula { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--quiet); }
+figure { margin: 16px 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+figcaption { font-size: 13px; color: var(--quiet); margin-top: 8px; }
+svg.chart { width: 100%; height: auto; font-size: 12px; }
+svg.chart .band { fill: var(--band); }
+svg.chart .grid { stroke: var(--line); }
+svg.chart .tick, svg.chart .axis, svg.chart .note { fill: var(--quiet); }
+svg.chart .median { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3; }
+svg.chart .rowlabel { fill: var(--ink); font-weight: 600; }
+svg.chart .rowlabel.flagged { fill: var(--crit); }
+svg.chart .dot { fill: #8a96a3; fill-opacity: 0.7; }
+svg.chart .out { fill: var(--crit); fill-opacity: 0.85; }
+svg.chart .me { fill: var(--accent); stroke: #fff; stroke-width: 2; }
+svg.chart .melabel { fill: var(--accent); font-weight: 700; }
+svg.chart .offscale { fill: var(--crit); font-size: 11px; }
