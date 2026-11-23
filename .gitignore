@@ -1,8 +1,0 @@
-   __pycache__/
-   *.pyc
-   .pytest_cache/
-   .venv/
-   *.db
-   data/*.csv
-   !data/.gitkeep
-   data/secret.key
