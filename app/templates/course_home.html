@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+{% block content %}
+<div class="intro">
+  <div>
+    <h1>{{ course.name }}</h1>
+    <p class="lead">{{ course.n_groups }} groups, {{ course.stations }} lab stations. Each step is one part of the experiment; a later step can take its starting value from an earlier step's class result.</p>
+  </div>
+  <form method="post" action="/c/{{ course.code }}/logout" class="counts">
+    <span>Signed in as <strong style="display:inline;font-size:18px">{{ 'teacher' if role == 'teacher' else 'class' }}</strong></span><br>
+    <button class="linkbtn" type="submit" style="color:var(--graphite)">Leave course on this device</button>
+  </form>
+</div>
+
+{% if role == 'teacher' %}
+<div class="share">
+  <strong>Share with your students:</strong> the course code <code>{{ course.code }}</code> and the class password.
+  They open <em>Courses</em>, enter both and see this page.
+</div>
+{% endif %}
+
+{% if steps %}
+<ol class="chain">
+  {% for st in steps %}
+  <li class="cat-{{ st.category_class }}">
+    <div class="mini" aria-hidden="true"><span class="tile-no">{{ st.position }}</span>{{ st.exp.result_symbol }}</div>
+    <div class="step-card">
+      <h3>Step {{ st.position }}: {{ st.title }}</h3>
+      <p class="meta">{{ st.exp.title }}, {{ st.exp.runs }} runs per group</p>
+      {% for l in st.links %}<p class="uses">{{ l.label }} comes from the result of step {{ l.position }}</p>{% endfor %}
+      <div class="groups" aria-label="Groups in this step">
+        {% for g in st.groups %}<span class="{{ 'done' if g in st.done }}" title="{{ 'submitted' if g in st.done else 'not submitted yet' }}">{{ g }}{% if g in st.done %} ✓{% endif %}</span>{% endfor %}
+      </div>
+      <p>{% if st.value is not none %}Class result so far: <strong>{{ st.exp.result_symbol }} = {{ fmt(st.exp, st.value) }}</strong>, median of {{ st.n }} group{{ 's' if st.n != 1 }}.{% else %}<span class="muted">No results yet.</span>{% endif %}</p>
+      <div class="actions">
+        <a class="button" href="/c/{{ course.code }}/s/{{ st.id }}/new">Enter values</a>
+        <a class="button quiet" href="/c/{{ course.code }}/s/{{ st.id }}/class">Class</a>
+        <a class="button quiet" href="/c/{{ course.code }}/s/{{ st.id }}/stations">Stations</a>
+        {% if role == 'teacher' %}
+        <form method="post" action="/c/{{ course.code }}/s/{{ st.id }}/delete" onsubmit="return confirm('Delete step {{ st.position }} and all its entries?')">
+          <button class="linkbtn" type="submit">Delete step</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<p class="notice">{% if role == 'teacher' %}No steps yet. Add the first part of your experiment.{% else %}Your teacher has not added any steps yet.{% endif %}</p>
+{% endif %}
+
+{% if role == 'teacher' %}
+<div class="actions"><a class="button" href="/c/{{ course.code }}/steps/new">Add a step</a></div>
+{% endif %}
+{% endblock %}

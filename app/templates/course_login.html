@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<h1>{{ course.name }}</h1>
+<p class="lead">This course is protected. Enter the class password from your teacher.</p>
+<form method="post" action="/c/{{ course.code }}/login" class="panel" style="max-width:420px">
+  {% if error %}<div class="alert crit" role="alert">That password is not right for this course.</div>{% endif %}
+  <label><span class="lbl">Password</span><input name="password" type="password" required autofocus autocomplete="current-password"></label>
+  <small>Teachers use their own password here.</small>
+  <div class="actions"><button class="button" type="submit">Open course</button></div>
+</form>
+{% endblock %}

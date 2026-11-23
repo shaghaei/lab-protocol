@@ -1,0 +1,23 @@
+{% set base = scope.base if scope else '/e/' ~ exp.id %}
+<div class="cat-{{ exp.category|lower|replace(' ', '-') }}">
+  {% if scope and scope.course %}
+  <p class="crumb"><a href="/c/{{ scope.course.code }}">{{ scope.course.name }}</a> <span aria-hidden="true">/</span> Step {{ scope.step.position }}</p>
+  {% endif %}
+  <div class="exp-head">
+    <div class="mini" aria-hidden="true">{% if number and not (scope and scope.course) %}<span class="tile-no">{{ number }}</span>{% endif %}{% if scope and scope.course %}<span class="tile-no">{{ scope.step.position }}</span>{% endif %}{{ exp.result_symbol }}</div>
+    <div>
+      <div class="cat-line">{{ exp.category }}{% if not exp.builtin %}, custom experiment{% endif %}</div>
+      <h1>{% if scope and scope.course %}{{ scope.step.title }}{% else %}{{ exp.title }}{% endif %}</h1>
+    </div>
+  </div>
+  <nav class="tabs" aria-label="Experiment">
+    {% if scope and scope.course %}
+    <a href="/c/{{ scope.course.code }}">Course</a>
+    {% else %}
+    <a href="{{ base }}" {% if tab == 'overview' %}aria-current="page"{% endif %}>Overview</a>
+    {% endif %}
+    <a href="{{ base }}/new" {% if tab == 'new' %}aria-current="page"{% endif %}>Enter values</a>
+    <a href="{{ base }}/class" {% if tab == 'class' %}aria-current="page"{% endif %}>Class</a>
+    <a href="{{ base }}/stations" {% if tab == 'stations' %}aria-current="page"{% endif %}>Stations</a>
+  </nav>
+</div>

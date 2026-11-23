@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Add a step: {{ course.name }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/c/{{ course.code }}">{{ course.name }}</a> <span aria-hidden="true">/</span> New step</p>
+<h1>Add a step</h1>
+<p class="lead">A step is one part of the experiment, done by some of the groups. If it needs a value that an earlier step measures, link it: the class result of that step is filled in for the groups automatically.</p>
+
+{% if problems %}
+<div class="alert crit" role="alert"><ul>{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<div class="steps-form">
+<section class="step">
+  <h2>Choose the experiment</h2>
+  <p class="muted">Any experiment of the catalog, including your own from Create experiment.</p>
+  <div class="pick">
+    {% for e in experiments %}
+    <a class="cat-{{ e.category|lower|replace(' ', '-') }}" href="?experiment={{ e.id }}" {% if chosen and chosen.id == e.id %}aria-current="true"{% endif %}><b>{{ e.result_symbol }}</b>{{ e.title }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if chosen %}
+<form method="post">
+  <input type="hidden" name="experiment" value="{{ chosen.id }}">
+  <section class="step">
+    <h2>Name and groups</h2>
+    <div class="grid-fields">
+      <label class="wide"><span class="lbl">Name of the step</span>
+        <input name="title" placeholder="{{ chosen.title }}">
+        <small>For example "Find the factor of our NaOH solution". Leave empty to use the experiment's name.</small>
+      </label>
+    </div>
+    <p class="lbl" style="margin:16px 0 0;font-weight:500">Groups doing this step</p>
+    <div class="checks">
+      {% for g in course.groups %}
+      <label><input type="checkbox" name="groups" value="{{ g }}">{{ g }}{% if g not in free_groups %} <span class="muted">(has a step)</span>{% endif %}</label>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="step">
+    <h2>Values from earlier steps</h2>
+    {% if steps %}
+    <p class="muted">For each value, choose whether groups measure it or it comes from an earlier step's class median.</p>
+    <table class="rows">
+      <thead><tr><th>Value</th><th>Source</th></tr></thead>
+      <tbody>
+      {% for q in chosen.quantities %}
+      <tr>
+        <td data-label="Value">{{ q.label }}{% if q.unit %} [{{ q.unit }}]{% endif %}</td>
+        <td data-label="Source">
+          <select name="link_{{ q.key }}">
+            <option value="">Groups measure it</option>
+            {% for st in steps %}{% set e = step_titles[st.id] %}
+            <option value="{{ st.id }}" {% if q.key == 'f_NaOH' and e and e.id == 'naoh-titer' %}selected{% endif %}>Result of step {{ st.position }}: {{ st.title }} ({{ e.result_symbol if e else '' }})</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">This is the first step, so all values are measured by the groups.</p>
+    {% endif %}
+  </section>
+
+  <div class="actions"><button class="button" type="submit">Add step</button></div>
+</form>
+{% endif %}
+</div>
+{% endblock %}

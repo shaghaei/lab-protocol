@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Lab Protocol{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="/">
+        <svg width="22" height="28" viewBox="0 0 22 28" aria-hidden="true"><path d="M8 1h6M9 1v9L2 24a2 2 0 0 0 1.8 3h14.4A2 2 0 0 0 20 24L13 10V1" fill="none" stroke="#1a2b4c" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19h12l2.2 4.6A1 1 0 0 1 18.3 25H3.7a1 1 0 0 1-.9-1.4z" fill="#c2185b" fill-opacity=".85"/></svg>
+        Lab Protocol
+      </a>
+      <nav aria-label="Main">
+        <a href="/" {% if nav == 'catalog' %}aria-current="page"{% endif %}>Experiments</a>
+        <a href="/courses" {% if nav == 'courses' %}aria-current="page"{% endif %}>Courses</a>
+        <a class="create" href="/experiments/new" {% if nav == 'builder' %}aria-current="page"{% endif %}>Create experiment</a>
+        <a href="/about" {% if nav == 'about' %}aria-current="page"{% endif %}>About</a>
+      </nav>
+    </div>
+  </header>
+  <main class="{% block main_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>Software demo with synthetic data. Not an official lab instruction: carry out experiments only under supervision and follow the safety data sheets.</p>
+    <p>The app gives feedback and never grades. <a href="/about">How it works and privacy</a></p>
+  </footer>
+</body>
+</html>

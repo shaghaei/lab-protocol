@@ -1,0 +1,18 @@
+{% if findings %}
+<ul class="findings">
+  {% for f in findings %}
+  {% set lab = KIND_LABELS[f.kind] %}
+  <li class="finding {{ lab[1] }}">
+    <span class="badge {{ lab[1] }}">{{ lab[0] }}</span>
+    <p>{{ f.message }}</p>
+    {% if f.causes %}
+    <p class="sub">Likely causes, most specific first</p>
+    <ol>{% for c in f.causes %}<li>{{ c }}</li>{% endfor %}</ol>
+    {% endif %}
+    <p class="rule">Rule: {{ f.rule }}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="ok-line">No findings. The runs agree with each other and with the class.</p>
+{% endif %}

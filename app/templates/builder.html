@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% set nav = 'builder' %}
+{% block title %}Create an experiment{% endblock %}
+{% macro field(name, label, hint='', type='text', cls='') -%}
+<label class="{{ cls }}"><span class="lbl">{{ label }}</span>
+  <input type="{{ type }}" name="{{ name }}" value="{{ form.get(name, '') }}" {% if type == 'text' %}autocomplete="off"{% endif %}>
+  {% if hint %}<small>{{ hint }}</small>{% endif %}
+</label>
+{%- endmacro %}
+{% macro area(name, label, hint='', cls='wide') -%}
+<label class="{{ cls }}"><span class="lbl">{{ label }}</span>
+  <textarea name="{{ name }}">{{ form.get(name, '') }}</textarea>
+  {% if hint %}<small>{{ hint }}</small>{% endif %}
+</label>
+{%- endmacro %}
+{% block content %}
+<h1>Create an experiment</h1>
+<p class="lead">Describe what groups measure and how the result is calculated. The app then checks entries, compares groups and flags likely errors for your experiment, as it does for the built-in ones.</p>
+
+{% if problems %}
+<div class="alert crit" role="alert"><strong>Before saving, fix these:</strong>
+  <ul>{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<div class="steps-form">
+<section class="step">
+  <h2>Start from</h2>
+  <p class="muted">A template fills in a typical set of quantities and a formula you can change. To adapt an existing experiment, open it and choose "Copy and edit".</p>
+  <div class="templates">
+    {% for key, (label, base) in templates.items() %}
+    <a class="template cat-{{ base.category|lower|replace(' ', '-') }}" href="/experiments/new?template={{ key }}" {% if chosen == key %}aria-current="true"{% endif %}>{{ label }}<small>like "{{ base.title }}"</small></a>
+    {% endfor %}
+    <a class="template cat-other" href="/experiments/new?template=blank" {% if chosen == 'blank' %}aria-current="true"{% endif %}>Blank<small>Start with empty fields</small></a>
+  </div>
+</section>
+
+{% if started %}
+<form method="post" action="/experiments/new">
+<section class="step">
+  <h2>About the experiment</h2>
+  <div class="grid-fields">
+    {{ field('title', 'Name', 'For example "Chloride in tap water by Mohr titration".', cls='wide') }}
+    <label><span class="lbl">Category</span>
+      <select name="category">{% for c in CATEGORIES %}<option {% if form.get('category') == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+    </label>
+    {{ field('runs', 'Runs per group', '1 to 6 repetitions.') }}
+    {{ field('stations', 'Lab stations', 'How many benches or setups.') }}
+    {{ area('summary', 'Short description', 'One or two sentences on the goal.') }}
+    {{ area('procedure', 'Procedure', 'One step per line.') }}
+  </div>
+</section>
+
+<section class="step">
+  <h2>What groups measure</h2>
+  <p class="muted">One row per value that groups read or weigh in each run. The symbol is what you use in the formula. Leave unused rows empty.</p>
+  {% set qs = form.quantities %}
+  {% set nq = [[qs|length + 2, 3]|max, 8]|min %}
+  <div class="table-wrap">
+  <table class="rows">
+    <thead><tr><th>Symbol</th><th>Name</th><th>Unit</th><th>Min</th><th>Max</th><th>Decimals</th><th>Example</th></tr></thead>
+    <tbody>
+    {% for i in range(1, nq + 1) %}
+    {% set q = qs[i - 1] if i <= qs|length else {} %}
+    <tr>
+      <td data-label="Symbol"><input name="q{{ i }}_key" value="{{ q.get('key', '') }}" {% if not qs %}placeholder="V_end"{% endif %} size="8" autocomplete="off"></td>
+      <td data-label="Name"><input name="q{{ i }}_label" value="{{ q.get('label', '') }}" {% if not qs %}placeholder="Burette end reading"{% endif %}></td>
+      <td data-label="Unit"><select name="q{{ i }}_unit">{% for u in UNITS %}<option value="{{ u }}" {% if q.get('unit', '') == u %}selected{% endif %}>{{ u or 'none' }}</option>{% endfor %}</select></td>
+      <td data-label="Min"><input name="q{{ i }}_min" value="{{ q.get('min', '') }}" size="6" inputmode="decimal"></td>
+      <td data-label="Max"><input name="q{{ i }}_max" value="{{ q.get('max', '') }}" size="6" inputmode="decimal"></td>
+      <td data-label="Decimals"><input name="q{{ i }}_decimals" value="{{ q.get('decimals', '') }}" size="3" inputmode="numeric"></td>
+      <td data-label="Example"><input name="q{{ i }}_example" value="{{ q.get('example', '') }}" size="7" inputmode="decimal"></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="step">
+  <h2>Constants</h2>
+  <p class="muted">Fixed numbers the formula needs, such as molar masses. Optional.</p>
+  {% set cs = form.constants %}
+  {% set nc = [[cs|length + 1, 2]|max, 5]|min %}
+  <div class="table-wrap">
+  <table class="rows">
+    <thead><tr><th>Symbol</th><th>Name</th><th>Value</th><th>Unit</th></tr></thead>
+    <tbody>
+    {% for i in range(1, nc + 1) %}
+    {% set c = cs[i - 1] if i <= cs|length else {} %}
+    <tr>
+      <td data-label="Symbol"><input name="c{{ i }}_key" value="{{ c.get('key', '') }}" {% if not cs %}placeholder="M_KHP"{% endif %} size="8" autocomplete="off"></td>
+      <td data-label="Name"><input name="c{{ i }}_label" value="{{ c.get('label', '') }}" {% if not cs %}placeholder="Molar mass of KHP"{% endif %}></td>
+      <td data-label="Value"><input name="c{{ i }}_value" value="{{ c.get('value', '') }}" size="8" inputmode="decimal"></td>
+      <td data-label="Unit"><input name="c{{ i }}_unit" value="{{ c.get('unit', '') }}" size="6" {% if not cs %}placeholder="g/mol"{% endif %}></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="step">
+  <h2>Result</h2>
+  <p class="muted">Write the formula with the symbols above and + − * / ^ and brackets. sqrt, log, log10 and exp are also available.</p>
+  <div class="grid-fields">
+    {{ field('formula', 'Formula', 'Example: m_KHP / M_KHP / ((V_end - V_start) / 1000) / c_nom', cls='wide') }}
+    {{ field('result_label', 'Name of the result', 'For example "Chloride content".') }}
+    {{ field('result_symbol', 'Symbol', 'Shown large, for example β or f.') }}
+    {{ field('result_unit', 'Unit', 'For example mg/L. Leave empty if none.') }}
+    {{ field('result_decimals', 'Decimals') }}
+    {{ field('expected', 'Expected result', 'The value a careful group should get.') }}
+    {{ field('tolerance_percent', 'Usual range ± %', 'Results outside it are noted.') }}
+  </div>
+</section>
+
+<section class="step">
+  <h2>Checks and likely causes</h2>
+  <div class="grid-fields">
+    {{ area('constraints', 'Rules between values', 'One per line, for example V_end > V_start. Entries breaking a rule are not saved.') }}
+    {{ field('max_rsd_percent', 'Allowed spread between runs (RSD %)', 'Above this, the runs of a group are flagged as disagreeing.') }}
+    {{ field('min_spread', 'Smallest class spread', 'In result units. Leave empty for 0.3 % of the expected result.') }}
+    {{ area('causes_low', 'If a result is too low, likely causes', 'One per line, most common first.') }}
+    {{ area('causes_high', 'If a result is too high, likely causes', 'One per line, most common first.') }}
+  </div>
+</section>
+
+{% if test %}
+<div class="test-box" role="status">
+  <strong>Test with the example values</strong>
+  {% if test.result is not none %}
+  <div class="result-big">{{ form.get('result_symbol') or 'R' }} = {{ test.result|fmt(built.result_decimals) }}{% if built.result_unit %}<span class="unit">{{ built.result_unit }}</span>{% endif %}</div>
+  <p class="muted">Expected {{ built.expected|fmt(built.result_decimals) }}. If the two are far apart, check the formula and the units.</p>
+  {% endif %}
+  {% if test.errors %}<ul>{% for e in test.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+  {% if test.warnings %}<ul>{% for w in test.warnings %}<li>{{ w }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% endif %}
+
+<div class="actions">
+  <button class="button quiet" type="submit" name="action" value="test">Test with example values</button>
+  <button class="button" type="submit" name="action" value="save">Save experiment</button>
+</div>
+</form>
+{% endif %}
+</div>
+{% endblock %}

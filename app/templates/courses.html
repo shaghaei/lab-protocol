@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+<h1>Courses</h1>
+<p class="lead">A course keeps one practical's data together. Groups join with the class password, see everyone's results and enter the values of their own group. Long experiments run as a chain of steps.</p>
+
+<div class="cards2">
+  <section class="panel">
+    <h3>Join your course</h3>
+    {% if error %}<div class="alert crit" role="alert">Course code or password is not right. Check both and try again.</div>{% endif %}
+    <form method="post" action="/courses/join">
+      <label><span class="lbl">Course code</span><input name="code" required autocomplete="off" placeholder="chem-lab-ws26-3f9a"></label>
+      <label style="margin-top:12px"><span class="lbl">Password</span><input name="password" type="password" required autocomplete="current-password"></label>
+      <small>Students use the class password, teachers their own.</small>
+      <div class="actions"><button class="button" type="submit">Open course</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <h3>Teaching a practical?</h3>
+    <p class="muted">Create a course, set up its groups and the chain of experiments, and share the code and the class password with your students.</p>
+    <div class="actions"><a class="button quiet" href="/courses/new">Create a course</a></div>
+    <h3 style="margin-top:22px">Try the demo course</h3>
+    <dl class="facts">
+      <dt>Course code</dt><dd>{{ demo.code }}</dd>
+      <dt>Class password</dt><dd>{{ demo.class }}</dd>
+      <dt>Teacher password</dt><dd>{{ demo.teacher }}</dd>
+    </dl>
+  </section>
+</div>
+{% endblock %}

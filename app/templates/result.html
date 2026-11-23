@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Group {{ me.group_code }}: {{ exp.title }}{% endblock %}
+{% block content %}
+{% include "_exp_header.html" %}
+
+<h2 style="margin-top:0">Group {{ me.group_code }}, station {{ me.station }}</h2>
+<div class="result-line">
+  <span class="result-big"><span class="sym">{{ exp.result_symbol }} =</span>{{ me.result.mean|fmt(exp.result_decimals) }}{% if exp.result_unit %}<span class="unit">{{ exp.result_unit }}</span>{% endif %}</span>
+  {% if me.result.rsd_percent is not none %}<span class="muted">Spread between runs: RSD {{ me.result.rsd_percent|fmt(2) }} %</span>{% endif %}
+</div>
+<p class="muted">Submitted {{ me.submitted_at[:16]|replace('T', ' ') }} UTC. Values are locked.{% if me.source == 'synthetic' %} Synthetic demo data.{% endif %}</p>
+
+{% if not me.findings %}
+<div class="banner good" role="status">
+  <svg class="flask" width="46" height="56" viewBox="0 0 46 56" aria-hidden="true"><defs><clipPath id="fl"><path d="M17 4v18L4 46a5 5 0 0 0 4.4 7.4h29.2A5 5 0 0 0 42 46L29 22V4z"/></clipPath></defs><rect class="liquid" x="0" y="30" width="46" height="26" clip-path="url(#fl)"/><path d="M14 3h18M17 4v18L4 46a5 5 0 0 0 4.4 7.4h29.2A5 5 0 0 0 42 46L29 22V4" fill="none" stroke="#1a2b4c" stroke-width="2.2" stroke-linejoin="round"/></svg>
+  <div>
+    <strong>Endpoint reached: a clean result.</strong>
+    <p>Your runs agree with each other and with the class.{% if standing %}{% if standing.closer_than == 100 %} No other group is closer to the class median.{% elif standing.closer_than >= 50 %} You are closer to the class median than {{ standing.closer_than }} % of the other groups.{% endif %}{% endif %}</p>
+    {% if standing %}<div class="meter" aria-hidden="true">{% for d in standing.dots %}<i class="{{ d }}"></i>{% endfor %}</div>
+    <small>{{ standing.in_zone }} of {{ standing.n }} groups are in the class zone (green). Pink is you.</small>{% endif %}
+  </div>
+</div>
+{% else %}
+<div class="banner check" role="status">
+  <svg width="46" height="56" viewBox="0 0 46 56" aria-hidden="true"><path d="M14 3h18M17 4v18L4 46a5 5 0 0 0 4.4 7.4h29.2A5 5 0 0 0 42 46L29 22V4" fill="#ffffff" stroke="#1a2b4c" stroke-width="2.2" stroke-linejoin="round"/><path d="M23 30v9M23 44v1" stroke="#9a6300" stroke-width="3" stroke-linecap="round"/></svg>
+  <div>
+    <strong>{{ me.findings|length }} thing{{ 's' if me.findings|length != 1 }} worth a second look</strong>
+    <p>Usually it comes down to one small slip that is quick to find. The hints below start with the most likely one.{% if standing %} {{ standing.in_zone }} of {{ standing.n }} groups are in the class zone so far.{% endif %}</p>
+  </div>
+</div>
+{% endif %}
+
+{% if me.findings %}
+<h2>Findings</h2>
+<p class="muted" style="margin-top:-6px">Rule-based checks. They point to likely causes; they do not grade.</p>
+{% set findings = me.findings %}
+{% include "_findings.html" %}
+{% endif %}
+
+{% if warnings %}
+<div class="alert"><strong>Notes on your entry</strong><ul>{% for w in warnings %}<li>{{ w }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<h2>Your result against the class</h2>
+{% if chart %}
+<figure>{{ chart|safe }}
+  <figcaption>Each dot is one group's mean. The shaded zone is the class median ±3 robust standard deviations ({{ stats.n }} groups). Your group is the pink dot.</figcaption>
+</figure>
+{% else %}
+<p>Fewer than 5 groups have submitted, so there is no class comparison yet.</p>
+{% endif %}
+
+<h2>Calculation</h2>
+<div class="table-wrap">
+<table class="data">
+  <thead><tr><th>Run</th>{% for q in exp.quantities %}<th class="n">{{ q.key }}{% if q.unit %} [{{ q.unit }}]{% endif %}</th>{% endfor %}<th class="n">{{ exp.result_symbol }}{% if exp.result_unit %} [{{ exp.result_unit }}]{% endif %}</th></tr></thead>
+  <tbody>
+  {% for r in me.result.runs %}
+  <tr><td>{{ r.index }}</td>{% for q in exp.quantities %}<td class="n">{{ r.values[q.key]|fmt(q.decimals) }}</td>{% endfor %}<td class="n"><strong>{{ r.result|fmt(exp.result_decimals + 1) }}</strong></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="formula-box cat-{{ exp.category|lower|replace(' ', '-') }}" style="margin-top:14px">{{ exp.result_symbol }} = {{ exp.formula }}</div>
+{% if exp.constants %}<p class="muted">{% for c in exp.constants %}{{ c.key }} = {{ '%g'|format(c.value) }}{% if c.unit %} {{ c.unit }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+{% endblock %}

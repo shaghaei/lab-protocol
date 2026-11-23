@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Stations: {{ exp.title }}{% endblock %}
+{% block content %}
+{% include "_exp_header.html" %}
+<p class="lead">When most groups at one station deviate in the same direction, the equipment is a more likely cause than the students.</p>
+
+{% if chart %}
+<figure>{{ chart|safe }}
+  <figcaption>One row per station. A red station name means its groups deviate together.</figcaption>
+</figure>
+<div class="table-wrap">
+<table class="data">
+  <thead><tr><th>Station</th><th class="n">Groups</th><th class="n">Median</th><th class="n">Against the class</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr>
+    <td>Station {{ r.station }}</td><td class="n">{{ r.n }}</td>
+    {% if r.info %}
+    <td class="n">{{ fmt(exp, r.info[0]) }}</td><td class="n">{{ fmt(exp, r.info[1], True) }}</td>
+    <td>{% if r.info[2] %}<span class="badge crit">Check equipment</span>{% else %}<span class="badge ok">In line</span>{% endif %}</td>
+    {% else %}
+    <td colspan="3" class="muted">Too few groups to compare</td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="rule">Rule: a station is flagged when its median differs from the class median by more than three standard errors of a median.</p>
+{% else %}
+<p class="notice">At least 5 group results are needed before stations can be compared.</p>
+{% endif %}
+{% endblock %}

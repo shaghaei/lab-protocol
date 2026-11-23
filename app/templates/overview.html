@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ exp.title }}{% endblock %}
+{% block content %}
+{% include "_exp_header.html" %}
+{% if request.query_params.get('created') %}
+<p class="notice">Experiment saved. Share this page with your groups, or enter the first values yourself.</p>
+{% endif %}
+
+<div class="two cat-{{ exp.category|lower|replace(' ', '-') }}">
+  <div>
+    <p class="lead">{{ exp.summary }}</p>
+    {% if exp.procedure %}
+    <h3>Procedure</h3>
+    <ol class="steps">{% for s in exp.procedure %}<li>{{ s }}</li>{% endfor %}</ol>
+    {% endif %}
+    <h3>Calculation</h3>
+    <div class="formula-box">{{ exp.result_symbol }} = {{ exp.formula }}</div>
+    <div class="table-wrap">
+    <table class="data" style="margin-top:14px">
+      <thead><tr><th>Symbol</th><th>Measured quantity</th><th>Unit</th><th class="n">Range</th><th class="n">Decimals</th></tr></thead>
+      <tbody>
+      {% for q in exp.quantities %}
+      <tr><td>{{ q.key }}</td><td>{{ q.label }}</td><td>{{ q.unit or '–' }}</td><td class="n">{{ '%g'|format(q.min_value) }} to {{ '%g'|format(q.max_value) }}</td><td class="n">{{ q.decimals }}</td></tr>
+      {% endfor %}
+      {% for c in exp.constants %}
+      <tr><td>{{ c.key }}</td><td>{{ c.label }} <span class="muted">(constant {{ '%g'|format(c.value) }})</span></td><td>{{ c.unit or '–' }}</td><td></td><td></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% if exp.sources %}
+    <h3>Sources</h3>
+    <ul>{% for s in exp.sources %}<li><a href="{{ s[1] }}">{{ s[0] }}</a></li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="panel">
+      <h3>This course</h3>
+      <dl class="facts">
+        <dt>Groups</dt><dd>{{ n }}</dd>
+        <dt>With findings</dt><dd>{{ flagged }}</dd>
+        {% if stats %}<dt>Class median</dt><dd>{{ fmt(exp, stats.median) }}</dd>{% endif %}
+        <dt>Expected</dt><dd>{{ fmt(exp, exp.expected) }}</dd>
+        <dt>Usual range</dt><dd>±{{ '%g'|format(exp.tolerance_percent) }} %</dd>
+        <dt>Runs per group</dt><dd>{{ exp.runs }}</dd>
+        <dt>Lab stations</dt><dd>{{ exp.stations }}</dd>
+      </dl>
+      <div class="actions">
+        <a class="button" href="/e/{{ exp.id }}/new">Enter values</a>
+        <a class="button quiet" href="/e/{{ exp.id }}/class">See the class</a>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>Adapt it</h3>
+      <p class="muted">Make your own version with other quantities, more runs or a different formula.</p>
+      <div class="actions">
+        <a class="button quiet" href="/experiments/new?source={{ exp.id }}">Copy and edit</a>
+        {% if not exp.builtin %}
+        <form method="post" action="/e/{{ exp.id }}/delete" onsubmit="return confirm('Delete this experiment and all its results?')">
+          <button class="button danger" type="submit">Delete experiment</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

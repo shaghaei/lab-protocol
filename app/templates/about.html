@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% set nav = 'about' %}
+{% block title %}About Lab Protocol{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<h1>About this demo</h1>
+<p class="lead">A portfolio project that digitises the paper protocol of basic chemistry practicals: checked entry at the bench, automatic calculation, comparison with the class and rule-based hints on likely errors.</p>
+
+<h2>How the checks work</h2>
+<ul>
+  <li><strong>Entry checks</strong> block impossible values, such as an end reading below the start reading or a mass typed in milligrams, and note unusual ones.</li>
+  <li><strong>Class comparison</strong> uses the median and the median absolute deviation, so a few wrong results do not move the reference.</li>
+  <li><strong>Station check</strong> compares the median of each lab station with the class to find faulty equipment.</li>
+  <li><strong>Typo check</strong> tests whether swapping two digits of one value makes a run agree with the others.</li>
+  <li>No AI model is used in this version. Every finding names the rule behind it.</li>
+</ul>
+
+<h2>Courses and chained steps</h2>
+<p>A teacher creates a course with two passwords: a teacher password to set up steps and correct entries, and a class password for the students. Students see every group's results in the course and enter the values of their own group. A step can take a value from an earlier step, for example the vinegar titration uses the NaOH factor that other groups determined; the class median of the earlier step is filled in and stored with each run.</p>
+
+<h2>Your own experiments</h2>
+<p>Anyone can create an experiment from a template or from scratch. Formulas are checked before they are stored and may only contain numbers, symbols and basic arithmetic, so they cannot run other code.</p>
+
+<h2>Privacy</h2>
+<ul>
+  <li>The demo contains only synthetic data. Groups are identified by codes; no names are collected.</li>
+  <li>No tracking. The only cookie is set when you open a course: it remembers which courses this browser may open and in which role. It is signed, so it cannot be edited, and it is technically necessary.</li>
+  <li>Course passwords are stored only as salted hashes (PBKDF2). Fonts are stored with the app; nothing is loaded from other servers.</li>
+  <li>A public deployment needs an Impressum and a privacy notice for the server logs.</li>
+</ul>
+
+<h2>Safety</h2>
+<p>This is a software demo, not an official lab instruction. Experiments are carried out only under supervision and according to the safety data sheets.</p>
+
+<h2>Credits</h2>
+<p>Typeface IBM Plex, licensed under the SIL Open Font License.</p>
+{% endblock %}

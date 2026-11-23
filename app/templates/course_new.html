@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Create a course{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<h1>Create a course</h1>
+<p class="lead">Two passwords keep the roles apart: yours lets you set up steps and correct entries, the class password lets students see the course and enter their group's values.</p>
+
+{% if problems %}
+<div class="alert crit" role="alert"><strong>Before creating the course, fix these:</strong>
+  <ul>{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<form method="post" class="step">
+  <div class="grid-fields">
+    <label class="wide"><span class="lbl">Course name</span>
+      <input name="name" value="{{ form.get('name', '') }}" required placeholder="General chemistry lab, winter term">
+    </label>
+    <label><span class="lbl">Number of groups</span>
+      <input name="n_groups" value="{{ form.get('n_groups', '') }}" inputmode="numeric">
+      <small>Groups are named G01, G02 and so on.</small>
+    </label>
+    <label><span class="lbl">Lab stations</span>
+      <input name="stations" value="{{ form.get('stations', '') }}" inputmode="numeric">
+    </label>
+    <label><span class="lbl">Teacher password</span>
+      <input name="teacher_password" type="password" autocomplete="new-password" required minlength="6">
+      <small>Only for you. At least 6 characters.</small>
+    </label>
+    <label><span class="lbl">Class password</span>
+      <input name="class_password" type="password" autocomplete="new-password" required minlength="6">
+      <small>Share it with your students.</small>
+    </label>
+  </div>
+  <div class="actions"><button class="button" type="submit">Create course</button></div>
+</form>
+<p class="muted">Passwords are stored only as salted hashes. They cannot be recovered, so note them somewhere safe.</p>
+{% endblock %}
