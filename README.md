@@ -6,6 +6,9 @@ calculates the result, compares it with every group in the course and points to 
 the group leaves the lab.
 
 > Portfolio project · digital transformation and documentation · synthetic demo data only
+>https://github.com/user-attachments/assets/25a562ac-522f-40e9-90e7-fbf8cd8d7ce0
+
+
 
 ## The problem
 
